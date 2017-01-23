@@ -14,6 +14,10 @@
       "js": ["client.js"]
     }
   ],
+  "icons" : {
+     "16": "ico-codeview.png",
+     "128":  "icon0.png"
+   },
   "permissions": [
     "tabs",
     "contextMenus",

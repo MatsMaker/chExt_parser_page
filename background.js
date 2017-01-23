@@ -1,21 +1,37 @@
 var contextMenusId;
 
 (function init(){
+
   chrome.browserAction.onClicked.addListener(function() {
     getPageHtml(hookParse);
-  });
+  })
+  chrome.tabs.onUpdated.addListener(function(){
+    initPage();
+  })
+  chrome.tabs.onHighlighted.addListener(function(){
+    initPage();
+  })
+  chrome.tabs.onActivated.addListener(function(){
+    initPage();
+  })
 
-  // chrome.runtime.onMessage.addListener(function(msg, _, sendResponse) {
-  //   if(msg.action == 'active'){
-  //     chrome.browserAction.setIcon({path:"icon2.png"});
-  //     // createContextMenu()
-  //     // sendResponse(true);
-  //   } else  if(msg.action == 'deactive'){
-  //     chrome.browserAction.setIcon({path:"icon1.png"});
-  //     // chrome.contextMenus.remove(contextMenusId, sendResponse);
-  //   }
-  // })
 })();
+
+function initPage() {
+  chrome.contextMenus.removeAll(function(result) {
+    chrome.browserAction.setIcon({path:"icon1.png"});
+    contextMenusId = undefined;
+    chrome.tabs.getSelected(null, function (tab) {
+      chrome.tabs.sendRequest(tab.id, {action: "getActiveHost"}, function(result) {
+        var toggleContextMenu = (result !== undefined && result.host == "www.upwork.com") ? "active" : "deactive";
+        if(toggleContextMenu == 'active' && contextMenusId === undefined){
+          chrome.browserAction.setIcon({path:"icon2.png"});
+          initContextMenu();
+        }
+      });
+    });
+  })
+}
 
 function genericOnClick(info, tab) {
   getPageHtml(hookParse);
@@ -34,23 +50,19 @@ function getPageHtml(callback) {
   }
 }
 
-// function createContextMenu() {
-//   var contexts = ["page","selection","link","editable","image","video","audio"];
-//   for (var i = 0; i < contexts.length; i++) {
-//     var context = contexts[i];
-//     var title = "Parse page";
-//     if(contextMenusId){
-//       chrome.contextMenus.update(contextMenusId, {checked: false})
-//     }else{
-//       contextMenusId = chrome.contextMenus.create({
-//         "title": title,
-//         "contexts":[context],
-//         "checked": true,
-//         "onclick": genericOnClick
-//       });
-//     }
-//   }
-// }
+function initContextMenu() {
+  var contexts = ["page","selection","link","editable","image","video","audio"];
+  for (var i = 0; i < contexts.length; i++) {
+    var context = contexts[i];
+    var title = "Parse page";
+    contextMenusId = chrome.contextMenus.create({
+      "title": title,
+      "contexts":[context],
+      "checked": true,
+      "onclick": genericOnClick
+    });
+  }
+}
 
 function hookParse(err, data) {
   if(err){

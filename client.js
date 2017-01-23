@@ -2,16 +2,11 @@
   chrome.extension.onRequest.addListener(function(request, sender, callback) {
       if (request.action == "getSource") {
         parser(document.getElementsByTagName('html')[0].innerHTML, showResult);
+      } else if (request.action == "getActiveHost") {
+        callback({host: location.host});
       }
+      callback({error: 'error'});
   });
-
-  // chrome.tabs.onActivated.addListener(function(){
-  //   console.log('tt');
-  //   var toggleContextMenu = (location.host == "www.upwork.com") ? "active" : "deactive";
-  //   chrome.runtime.sendMessage({action: toggleContextMenu}, function(result){
-  //     console.log('init parse upwork page', result);
-  //   });
-  // })
 })()
 
 function showResult(err, result) {
