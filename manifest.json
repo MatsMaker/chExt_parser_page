@@ -10,7 +10,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.upwork.com/*/*"],
+      "matches": ["<all_urls>"],
       "js": ["client.js"]
     }
   ],
@@ -21,6 +21,6 @@
   "permissions": [
     "tabs",
     "contextMenus",
-    "https://www.upwork.com/*/*"
+    "<all_urls>"
   ]
 }
